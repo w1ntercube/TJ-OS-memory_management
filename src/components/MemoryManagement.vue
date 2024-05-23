@@ -396,6 +396,7 @@ export default {
       }
       if (this.currentInstructionIndex >= this.instructionSequence.length) {
         this.instructionsComplete = true;
+        this.updatePageFaultRate();
       }
     },
     startAutoExecution() {
@@ -509,8 +510,12 @@ export default {
       });
     },
     updatePageFaultRate() {
-      this.pageFaultRate =
-        (this.pageFaults / (this.currentInstructionIndex + 1)) * 100;
+      if (this.currentInstructionIndex > 0) {
+        this.pageFaultRate =
+          (this.pageFaults / this.currentInstructionIndex) * 100;
+      } else {
+        this.pageFaultRate = 0;
+      }
     },
     prevPage() {
       if (this.currentPage > 1) {
