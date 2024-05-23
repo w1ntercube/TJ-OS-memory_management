@@ -25,7 +25,7 @@
 
 ### 方法一：在线运行
 
-- 打开浏览器，访问 [ https://w1ntercube.github.io/TJ-os-memory_management/]( https://w1ntercube.github.io/TJ-os-memory_management/)
+- 打开浏览器，访问 [ https://w1ntercube.github.io/TJ-os-memory_management/](https://w1ntercube.github.io/TJ-os-memory_management/)
 
 ### 方法二：本地运行
 
@@ -33,11 +33,6 @@
 
 - 安装 Node.js 和 npm:
   [Node.js 官网](https://nodejs.org/)
-  查看版本：
-
-  ```bash
-  npm -v
-  ```
 
 - 安装依赖：
 
