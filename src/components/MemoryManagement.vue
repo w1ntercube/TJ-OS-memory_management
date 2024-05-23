@@ -218,17 +218,13 @@ export default {
     };
   },
   computed: {
-    computed: {
-      totalPages() {
-        // 计算总页数，根据指令表格的长度和每页显示的指令数
-        return Math.ceil(this.instructionTable.length / this.pageSize);
-      },
-      visibleInstructions() {
-        // 计算当前页显示的指令
-        const start = (this.currentPage - 1) * this.pageSize;
-        const end = start + this.pageSize;
-        return this.instructionTable.slice(start, end);
-      },
+    totalPages() {
+      return Math.ceil(this.instructionTable.length / this.pageSize);
+    },
+    visibleInstructions() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.instructionTable.slice(start, end);
     },
   },
   methods: {
@@ -258,31 +254,28 @@ export default {
       this.customInstructions = "";
     },
     applyCustomInstructions() {
-      // 去除输入中的空白字符
       const trimmedInput = this.customInstructions.trim();
       if (trimmedInput === "") {
-        // 输入为空或者只包含空格，设置输入错误状态并返回
+        // 输入为空或者只包含空格
         this.inputError = true;
         return;
       }
-      // 将输入字符串拆分为数字数组
       const instructions = this.customInstructions
         .trim()
         .split(/\s+/)
         .map(Number);
       const valid = instructions.every(Number.isInteger);
       if (valid && instructions.length > 0) {
-        // 如果所有指令都是有效整数并且非空
         this.instructionSequence = instructions;
         this.totalInstructions = instructions.length;
         this.currentInstructionIndex = 0;
         this.currentInstruction =
           this.instructionSequence[this.currentInstructionIndex];
-        this.showCustomInstructionInput = false; // 隐藏自定义指令输入框
-        this.inputError = false;
+        this.showCustomInstructionInput = false;
+        this.inputError = false; // 清除错误状态
         this.initializeSimulation();
       } else {
-        // 如果输入不合法，设置输入错误状态但不清空输入框
+        // 显示错误提示但不清空输入框
         this.inputError = true;
       }
     },
@@ -312,7 +305,7 @@ export default {
     },
     generateRandomInstructionSequence() {
       let sequence = [];
-      let m = Math.floor(Math.random() * this.totalInstructions); // 随机选取一个起始执行指令，如序号为m
+      let m = Math.floor(Math.random() * this.totalInstructions);
       let count = 0;
 
       while (count < this.totalInstructions) {
@@ -320,18 +313,18 @@ export default {
         count++;
         if (count >= this.totalInstructions) break;
 
-        m = (m + 1) % this.totalInstructions; // 顺序执行下一条指令，即序号为m+1的指令
+        m = (m + 1) % this.totalInstructions;
         sequence.push(m);
         count++;
         if (count >= this.totalInstructions) break;
 
         if (m > 0) {
-          m = Math.floor(Math.random() * m); // 通过随机数，跳转到前地址部分0－m-1中的某个指令处，其序号为m1
+          m = Math.floor(Math.random() * m);
           sequence.push(m);
           count++;
           if (count >= this.totalInstructions) break;
 
-          m = (m + 1) % this.totalInstructions; // 顺序执行下一条指令，即序号为m1+1的指令
+          m = (m + 1) % this.totalInstructions;
           sequence.push(m);
           count++;
           if (count >= this.totalInstructions) break;
@@ -341,53 +334,49 @@ export default {
           m =
             Math.floor(Math.random() * (this.totalInstructions - 1 - m)) +
             m +
-            2; // 通过随机数，跳转到后地址部分m1+2~319中的某条指令处，其序号为m2
+            2;
           sequence.push(m);
           count++;
           if (count >= this.totalInstructions) break;
 
-          m = (m + 1) % this.totalInstructions; // 顺序执行下一条指令，即m2+1处的指令
+          m = (m + 1) % this.totalInstructions;
           sequence.push(m);
           count++;
         }
-      } // 重复跳转到前地址部分、顺序执行、跳转到后地址部分、顺序执行的过程，
-      // end of while
+      }
       return sequence;
     },
     executePrevInstruction() {
       if (this.currentInstructionIndex > 0) {
-        // 如果当前指令索引大于0，则可以回退指令
         this.currentInstructionIndex--;
         this.currentInstruction =
-          this.instructionSequence[this.currentInstructionIndex]; // 更新当前指令
+          this.instructionSequence[this.currentInstructionIndex];
 
         // 移除最后一条指令的表格条目
         this.instructionTable.pop();
-
         // 恢复之前的内存状态
         if (this.memoryHistory.length > 0) {
           this.memory = this.memoryHistory.pop();
         }
-
         // 撤销该指令的内存访问
         let pageNumber = Math.floor(this.currentInstruction / this.pageSize);
         let pageIndex = this.memory.indexOf(pageNumber);
 
         if (pageIndex !== -1) {
-          // 如果找到了页面，更新LRU或FIFO队列
+          // 找到页面，更新LRU或FIFO队列
           if (this.selectedAlgorithm === "FIFO") {
             this.fifoQueue[pageIndex]++;
           } else if (this.selectedAlgorithm === "LRU") {
             this.lruQueue[pageIndex]++;
           }
         } else {
-          // 如果页面未找到，即发生了缺页
+          // 页面未找到，即发生了缺页
           this.pageFaults--;
-
+          // 根据算法类型恢复FIFO或LRU队列
           if (this.selectedAlgorithm === "FIFO") {
-            this.fifoQueue = this.fifoQueue.slice(0, -1); // 恢复FIFO队列
+            this.fifoQueue = this.fifoQueue.slice(0, -1);
           } else if (this.selectedAlgorithm === "LRU") {
-            this.lruQueue = this.lruQueue.slice(0, -1); // 恢复LRU队列
+            this.lruQueue = this.lruQueue.slice(0, -1);
           }
         }
 
@@ -396,50 +385,35 @@ export default {
     },
     executeNextInstruction() {
       if (this.currentInstructionIndex < this.instructionSequence.length) {
-        // 如果当前指令索引小于指令序列的长度，则可以执行下一条指令
-
-        // 先把当前指令的内存状态记录下来
+        // 先把当前指令的内存访问记录下来
         this.memoryHistory.push([...this.memory]);
 
-        // 访问当前指令对应的内存页面
         this.accessMemory(this.currentInstruction, this.selectedAlgorithm);
-
-        // 增加当前指令索引，更新当前指令
         this.currentInstructionIndex++;
         this.currentInstruction =
           this.instructionSequence[this.currentInstructionIndex];
-
-        // 更新缺页率
         this.updatePageFaultRate();
       }
-
-      // 检查是否已执行完所有指令
       if (this.currentInstructionIndex >= this.instructionSequence.length) {
-        this.instructionsComplete = true; // 标记指令执行完成
+        this.instructionsComplete = true;
       }
     },
     startAutoExecution() {
-      if (this.autoExecutionInterval) return; // 如果已经在自动执行，则直接返回
+      if (this.autoExecutionInterval) return;
 
-      // 计算自动执行的时间间隔（毫秒）
       const intervalTime = Math.floor(1000 / this.executionSpeed);
-
-      // 设置定时器以自动执行指令
       this.autoExecutionInterval = setInterval(() => {
         if (this.currentInstructionIndex >= this.instructionSequence.length) {
-          // 如果当前指令索引已达到指令序列长度，停止自动执行
           clearInterval(this.autoExecutionInterval);
           this.autoExecutionInterval = null;
-          this.instructionsComplete = true; // 标记指令执行完成
+          this.instructionsComplete = true;
         } else {
-          // 执行下一条指令
           this.executeNextInstruction();
         }
       }, intervalTime);
     },
     pauseAutoExecution() {
       if (this.autoExecutionInterval) {
-        // 如果当前正在自动执行，则清除定时器以暂停执行
         clearInterval(this.autoExecutionInterval);
         this.autoExecutionInterval = null;
       }
@@ -457,50 +431,51 @@ export default {
     accessMemoryFIFO(pageNumber, pageIndex) {
       let pageFault = false;
       if (pageIndex === -1) {
-        // 如果页面不在内存中，发生缺页
+        // 页面未找到，发生缺页
         pageFault = true;
         this.pageFaults++;
 
         // 寻找空闲内存块
         const emptyIndex = this.memory.indexOf(null);
         if (emptyIndex !== -1) {
-          // 如果有空闲块，直接插入页面
+          // 有空闲块，直接插入
           this.memory[emptyIndex] = pageNumber;
           this.fifoQueue[emptyIndex] = this.currentInstructionIndex;
         } else {
-          // 如果没有空闲块，使用FIFO算法替换页面
-          const fifoIndex = this.fifoQueue.shift(); // 取出最早插入的页面索引
-          this.memory[fifoIndex] = pageNumber; // 替换该索引处的页面
-          this.fifoQueue.push(fifoIndex); // 更新FIFO队列
+          // 没有空闲块，使用FIFO替换页面
+          const fifoIndex = this.fifoQueue.indexOf(Math.min(...this.fifoQueue));
+          this.memory[fifoIndex] = pageNumber;
+          this.fifoQueue[fifoIndex] = this.currentInstructionIndex;
         }
+      } else {
+        // 页面已在内存中，更新FIFO队列
+        this.fifoQueue[pageIndex] = this.currentInstructionIndex;
       }
-      // 更新指令表格，记录当前指令的执行情况
       this.updateInstructionTable(pageNumber, pageFault);
     },
     accessMemoryLRU(pageNumber, pageIndex) {
       let pageFault = false;
       if (pageIndex === -1) {
-        // 如果页面不在内存中，发生缺页
+        // 页面未找到，发生缺页
         pageFault = true;
-        this.pageFaults++; // 增加缺页次数
+        this.pageFaults++;
 
         // 寻找空闲内存块
         const emptyIndex = this.memory.indexOf(null);
         if (emptyIndex !== -1) {
-          // 如果有空闲块，直接插入页面
+          // 有空闲块，直接插入
           this.memory[emptyIndex] = pageNumber;
           this.lruQueue[emptyIndex] = this.currentInstructionIndex;
         } else {
-          // 如果没有空闲块，使用LRU算法替换页面
-          const lruIndex = this.lruQueue.indexOf(Math.min(...this.lruQueue)); // 找到最久未使用的页面索引
-          this.memory[lruIndex] = pageNumber; // 替换该索引处的页面
-          this.lruQueue[lruIndex] = this.currentInstructionIndex; // 更新LRU队列
+          // 没有空闲块，使用LRU替换页面
+          const lruIndex = this.lruQueue.indexOf(Math.min(...this.lruQueue));
+          this.memory[lruIndex] = pageNumber;
+          this.lruQueue[lruIndex] = this.currentInstructionIndex;
         }
       } else {
-        // 如果页面在内存中，更新LRU队列
+        // 页面已在内存中，更新LRU队列
         this.lruQueue[pageIndex] = this.currentInstructionIndex;
       }
-      // 更新指令表格，记录当前指令的执行情况
       this.updateInstructionTable(pageNumber, pageFault);
     },
     resetSimulation() {
@@ -517,7 +492,6 @@ export default {
       this.selectedAlgorithm = null;
       if (this.autoExecutionInterval) {
         clearInterval(this.autoExecutionInterval);
-        // 如果当前正在自动执行，则清除定时器以停止执行
         this.autoExecutionInterval = null;
       }
       this.instructionsComplete = false;
