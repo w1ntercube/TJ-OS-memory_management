@@ -396,7 +396,6 @@ export default {
       }
       if (this.currentInstructionIndex >= this.instructionSequence.length) {
         this.instructionsComplete = true;
-        this.updatePageFaultRate();
       }
     },
     startAutoExecution() {
@@ -444,10 +443,13 @@ export default {
           this.fifoQueue[emptyIndex] = this.currentInstructionIndex;
         } else {
           // 没有空闲块，使用FIFO替换页面
-          const fifoIndex = this.fifoQueue.shift();
+          const fifoIndex = this.fifoQueue.indexOf(Math.min(...this.fifoQueue));
           this.memory[fifoIndex] = pageNumber;
-          this.fifoQueue.push(fifoIndex);
+          this.fifoQueue[fifoIndex] = this.currentInstructionIndex;
         }
+      } else {
+        // 页面已在内存中，更新FIFO队列
+        this.fifoQueue[pageIndex] = this.currentInstructionIndex;
       }
       this.updateInstructionTable(pageNumber, pageFault);
     },
@@ -508,7 +510,7 @@ export default {
     },
     updatePageFaultRate() {
       this.pageFaultRate =
-        (this.pageFaults / (this.currentInstructionIndex )) * 100;
+        (this.pageFaults / (this.currentInstructionIndex + 1)) * 100;
     },
     prevPage() {
       if (this.currentPage > 1) {
