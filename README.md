@@ -25,7 +25,7 @@
 
 ### 方法一：在线运行
 
-- 打开浏览器，访问 [https://github.com/w1ntercube/TJ-os-memory_management/settings/pages](https://github.com/w1ntercube/TJ-os-memory_management/settings/pages)。
+- 打开浏览器，访问 [ https://w1ntercube.github.io/TJ-os-memory_management/]( https://w1ntercube.github.io/TJ-os-memory_management/)
 
 ### 方法二：本地运行
 
