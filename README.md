@@ -1,24 +1,86 @@
-# memory_management
+# 请求调页存储管理方式模拟
 
-## Project setup
-```
-npm install
-```
+## 简介
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+本项目实现了一个基于 Vue.js 的内存管理模拟器，支持两种页面置换算法：FIFO（先进先出）和 LRU（最近最少使用）。用户可以输入指令数，也可以自定义指令序列，模拟器会实时计算并显示当前的缺页率。此外，用户可以进行单步执行、自动执行和单步回退。
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## 运行环境
 
-### Lints and fixes files
-```
-npm run lint
-```
+- 操作系统：Windows 11 家庭中文版
+- 浏览器：Edge 122.0.2365.92 (正式版本) (64 位)
+- Node.js：20.13.1
+- Vue CLI：5.0.8
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 功能
+
+- **指令数输入**：用户可以输入指令数，并选择使用随机生成的指令序列或自定义指令序列。
+- **页面置换算法选择**：用户可以选择使用 FIFO 或 LRU 算法进行页面置换。
+- **单步执行**：用户可以单步执行指令，查看每一步的内存状态变化。
+- **自动执行**：用户可以设置执行速度，自动执行指令序列。
+- **单步回退**：用户可以单步回退，查看之前的内存状态。
+- **自定义指令输入**：用户可以输入自定义的指令序列。
+- **缺页率计算**：模拟器会实时计算并显示当前的缺页率。
+
+## 运行方法
+
+### 方法一：在线运行
+
+- 打开浏览器，访问 [https://github.com/w1ntercube/TJ-os-memory_management/settings/pages](https://github.com/w1ntercube/TJ-os-memory_management/settings/pages)。
+
+### 方法二：本地运行
+
+- 克隆此仓库到本地
+
+- 安装 Node.js 和 npm:
+  [Node.js 官网](https://nodejs.org/)
+  查看版本：
+
+  ```bash
+  npm -v
+  ```
+
+- 安装依赖：
+
+  ```bash
+  npm install
+  ```
+
+  npm 是 Node.js 包管理器，用于安装和管理项目依赖。
+
+- 如果没有安装 Vue CLI，请先安装 Vue cli:
+
+  ```bash
+  npm install -g @vue/cli
+  ```
+
+- 启动开发服务器：
+
+  ```bash
+  npm run serve
+  ```
+
+- 打开浏览器，访问 `http://localhost:8080/`。
+
+## 使用方法
+
+1. 打开应用后，在指令数输入框中输入需要模拟的指令数。
+2. 点击“自定义指令”按钮可以输入自定义指令序列，每个指令用空格分隔。
+3. 选择页面置换算法（FIFO 或 LRU）。
+4. 使用“单步执行”按钮单步执行指令，使用“单步回退”按钮单步回退指令。
+5. 设置执行速度后，点击“自动执行”按钮可以自动执行指令序列。
+6. 模拟结束后，会显示最终的缺页率。
+
+## 项目结构
+
+- `src/` 目录包含项目的所有源代码
+  - `components/` 目录包含 Vue 组件，其中 `MemoryManagement.vue` 是模拟器的核心代码
+  - `views/` 目录包含视图组件
+  - `App.vue` 是项目的主组件
+  - `main.js` 是项目的入口文件
+
+## 技术栈
+
+- Vue.js
+- JavaScript
+- HTML
+- CSS
