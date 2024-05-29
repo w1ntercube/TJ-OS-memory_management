@@ -12,7 +12,7 @@
         />
         <button
           @click="openCustomInstructionInput"
-          :disabled="instructionsComplete"
+          :disabled="instructionsComplete || selectedAlgorithm"
           class="buttons"
         >
           自定义指令
@@ -455,6 +455,7 @@ export default {
     },
     accessMemoryLRU(pageNumber, pageIndex) {
       let pageFault = false;
+
       if (pageIndex === -1) {
         // 页面未找到，发生缺页
         pageFault = true;
@@ -463,20 +464,38 @@ export default {
         // 寻找空闲内存块
         const emptyIndex = this.memory.indexOf(null);
         if (emptyIndex !== -1) {
-          // 有空闲块，直接插入
+          // 如果有空闲块，直接插入页面
           this.memory[emptyIndex] = pageNumber;
-          this.lruQueue[emptyIndex] = this.currentInstructionIndex;
+          this.updateLRUQueue(emptyIndex); // 更新LRU队列
         } else {
-          // 没有空闲块，使用LRU替换页面
-          const lruIndex = this.lruQueue.indexOf(Math.min(...this.lruQueue));
+          // 如果没有空闲块，使用LRU替换页面
+          const lruIndex = this.findLRUIndex();
           this.memory[lruIndex] = pageNumber;
-          this.lruQueue[lruIndex] = this.currentInstructionIndex;
+          this.updateLRUQueue(lruIndex); // 更新LRU队列
         }
       } else {
         // 页面已在内存中，更新LRU队列
-        this.lruQueue[pageIndex] = this.currentInstructionIndex;
+        this.updateLRUQueue(pageIndex);
       }
+
       this.updateInstructionTable(pageNumber, pageFault);
+    },
+    updateLRUQueue(pageIndex) {
+      // 如果页面在LRU队列中存在，则将其移到队尾表示最近使用
+      const index = this.lruQueue.indexOf(pageIndex);
+      if (index !== -1) {
+        this.lruQueue.splice(index, 1);
+        this.lruQueue.push(pageIndex);
+      } else {
+        // 如果页面不在LRU队列中，将其添加到队尾
+        this.lruQueue.push(pageIndex);
+      }
+    },
+    findLRUIndex() {
+      // 返回LRU队列中队首的页面在内存中的位置，并将该页面从内存中移除
+      const lruIndex = this.lruQueue.shift();
+      this.memory[lruIndex] = null;
+      return lruIndex;
     },
     resetSimulation() {
       this.totalInstructions = 320;
